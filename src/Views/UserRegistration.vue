@@ -1,0 +1,199 @@
+<template>
+  <form class="form-container">
+
+    <label for="name">Nome:</label><br>
+    <input v-model="name" v-bind:class="{ 'is-invalid': errors.name }" type="text" id="name"><br>
+    <span v-if="errors.name" class="error">{{ errors.name[0] }}</span>
+
+    <label for="address">Endereço:</label><br>
+    <input v-model="address" v-bind:class="{ 'is-invalid': errors.address }" type="text" id="address"><br>
+    <span v-if="errors.address" class="error">{{ errors.address[0] }}</span>
+
+    <div class="img-container">
+      <div class="imglink">
+        <label for="picture">Link da imagem:</label><br>
+        <input v-model="picture" v-bind:class="{ 'is-invalid': errors.picture }" type="text" id="picture"><br>
+        <span v-if="errors.picture" class="error">{{ errors.picture[0] }}</span>
+      </div>
+      <div class="imgcheck">
+        <input v-model="includePicture" type="checkbox" id="include-picture">
+        <label for="include-picture">Incluir imagem</label>
+      </div>
+    </div>
+
+    <label for="email">Email:</label><br>
+    <input v-model="email" v-bind:class="{ 'is-invalid': errors.email }" type="text" id="email"><br>
+    <span v-if="errors.email" class="error">{{ errors.email[0] }}</span>
+
+    <div class="button-container">
+      <button v-on:click.prevent="saveUser">Salvar</button>
+      <button v-on:click.prevent="cancel">Cancelar</button>
+    </div>
+  </form>
+
+</template>
+
+<style scoped>
+.form-container {
+  font-size: 1.8em;
+  position: relative;
+  border-radius: 20px;
+  width: 30em;
+  height: 20em;
+  padding-bottom: 2.5em;
+  color: #000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(236, 233, 233);
+  text-align: center;
+  justify-content: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  padding-top: 8%;
+  margin-left: 20%;
+}
+
+.img-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.imglink {
+  display: flex;
+  flex-direction: column;
+  gap: 0em;
+  width: 50%;
+  padding-left: 3em;
+}
+
+.imgcheck {
+  display: flex;
+  flex-direction: column;
+  gap: 0em;
+  padding-right: 4em;
+}
+
+
+input {
+  align-self: center;
+  width: 50%;
+  height: 1em;
+  padding: 1.5em;
+  margin-bottom: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+button {
+  width: 5sem;
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.5s ease-in-out;
+}
+
+button:hover {
+  background-color: #45a049;
+  transition: 0.5s ease-in-out;
+  transform: scale(1.1);
+}
+
+@media screen and (max-width: 800px) {
+  .form-container {
+    width: 100%;
+    height: 100%;
+    margin-left: 0%;
+  }
+}
+</style>
+
+<script>
+
+import axios from 'axios'
+
+export default {
+  data() {
+    return {
+      name: '',
+      address: '',
+      picture: '',
+      email: '',
+      includePicture: false,
+      errors: {},
+      loading: false,
+      usersRegistred: []
+    }
+  },
+  methods: {
+    saveUser() {
+      this.loading = true;
+      this.errors = {}
+      if (!this.name) {
+        this.errors.name = ['The name field is required']
+      } else if (/\d/.test(this.name)) {
+        this.errors.name = ['The name field must not contain numbers']
+      }
+      if (!this.address) {
+        this.errors.address = ['The address field is required']
+      }
+      if (this.includePicture && !this.picture) {
+        this.errors.picture = ['The picture field is required']
+      }
+      if (!this.email) {
+        this.errors.email = ['The email field is required']
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+        this.errors.email = ['The email field must be a valid email address']
+      }
+
+      if (Object.keys(this.errors).length === 0) {
+        axios.get('http://54.86.195.171:3000//api/v1/users')
+          .then(response => {
+            this.usersRegistred = response.data
+            this.usersRegistred.forEach(user => {
+              if (user.email === this.email) {
+                this.errors.email = ['E-mail ja cadastrado, tente outro']
+              }
+            })
+          })
+        axios.post('http://54.86.195.171:3000//api/v1/users', {
+          name: this.name,
+          address: this.address,
+          picture: this.picture,
+          email: this.email
+        })
+          .then(response => {
+            if (response.status === 201) {
+              this.name = '';
+              this.address = '';
+              this.picture = '';
+              this.email = '';
+              this.loading = false;
+            }
+          })
+          .catch(error => {
+            // handle error
+            console.log(error)
+          })
+      }
+    },
+    cancel() {
+      this.$router.push({ name: 'Users' })
+    }
+  }
+}
+</script>
