@@ -1,30 +1,17 @@
 <template>
   <div class="container">
     <div class="box upper-box">
-      <h1>PRODUTOS CADASTADOS</h1>
+      <h1>PRODUTOS CADASTRADOS</h1>
       <div class="dados">
-        <img
-          src="../assets/boxes.svg"
-          contain
-          height="100"
-        />
-        <h1
-        style="font-size: 4em"
-        >20</h1>
+        <img src="../assets/boxes.svg" contain height="100"/>
+        <h1 style="font-size: 4em">{{ numProducts }}</h1>
       </div>
     </div>
     <div class="box upper-box">
       <h1>NÚMERO DE CLIENTES</h1>
       <div class="dados">
-        <img
-          src="../assets/users.svg"
-          class="my-3"
-          contain
-          height="100"
-        />
-        <h1
-        style="font-size: 4em"
-        >20</h1>
+        <img src="../assets/users.svg" class="my-3" contain height="100"/>
+        <h1 style="font-size: 4em">{{ numUsers }}</h1>
       </div>
     </div>
   </div>
@@ -35,12 +22,12 @@
       <table>
         <thead>
           <tr>
-            <th class="text-left">Image</th>
-            <th class="text-left">Name</th>
-            <th class="text-left">Category</th>
+            <th class="text-left">imagem</th>
+            <th class="text-left">Nome</th>
+            <th class="text-left">Categoria</th>
             <th class="text-left">UN</th>
-            <th class="text-left">Stocked</th>
-            <th class="text-left">Value</th>
+            <th class="text-left">Stoque</th>
+            <th class="text-left">Valor</th>
           </tr>
         </thead>
         <tbody>
@@ -92,13 +79,15 @@
 }
 
 .box {
+  border-radius: 10px;
+  border: 1px solid #182d4d;
   width: 50vh;
   height: 25vh;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   gap: 0px;
-  background-color: rgb(236, 233, 233);
+  background-color: rgb(255, 255, 255);
   text-align: center;
   justify-content: center;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -113,6 +102,7 @@
 .box img {
   width: 15vh;
   height: 10vh;
+ 
 }
 
 
@@ -147,9 +137,9 @@ tr:hover {
 
 th {
   text-align: left;
-  background-color: #929292;
+  background-color: #182d4d;
   position: sticky;
-  color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
 }
 td {
   text-align: left;
@@ -171,8 +161,38 @@ import axios from 'axios'
 export default {
   data() {
     return {
-      products: []
+      products: [],
+      numProducts: 0,
+      numUsers: 0
     }
+  },
+  created() {
+    // Fetch number of products and users when the component is created
+    this.fetchNumProducts()
+    this.fetchNumUsers()
+  },
+  methods: {
+    async fetchNumProducts() {
+      try {
+        const response = await fetch('http://54.86.195.171:3000//api/v1/products')
+        const data = await response.json()
+        // Set the number of products to the length of the array of products returned by the API
+        this.numProducts = data.length
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    async fetchNumUsers() {
+      try {
+        const response = await fetch('http://54.86.195.171:3000//api/v1/users')
+        const data = await response.json()
+        // Set the number of users to the length of the array of users returned by the API
+        this.numUsers = data.length
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    // other methods
   },
   computed: {
     filteredProducts() {

@@ -7,7 +7,8 @@
   </nav>
 </template>
 
-<style>
+<style scoped>
+ @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
   nav {
     display: flex;
     flex-direction: column;
@@ -22,9 +23,12 @@
   }
 
   h1 {
-    padding: 16px;
-    font-size: 24px;
-    color: #fff;
+    font-size: 40px;
+    color: rgb(212, 72, 72);
+    font-family: 'Pacifico', cursive;
+    font-weight: bold;
+    text-shadow: -1px -1px 0 rgb(71, 71, 71), 1px -1px 0 rgb(65, 64, 64), -1px 1px 0 rgb(112, 112, 112), 1px 1px 0 #000;
+
   }
 
   .nav-link {

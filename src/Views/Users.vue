@@ -12,11 +12,12 @@
       <table>
         <thead>
           <tr>
-            <th class="text-left">Picture</th>
-            <th class="text-left">Name</th>
-            <th class="text-left">Address</th>
-            <th class="text-left">User since</th>
-            <th class="text-left">Email</th>
+            <th class="text-left">Foto</th>
+            <th class="text-left">Nome</th>
+            <th class="text-left">Endereço</th>
+            <th class="text-left">Cadastrado em</th>
+            <th class="text-left">E-mail</th>
+            <th class="text-left">Ação</th>
           </tr>
         </thead>
         <tbody>
@@ -28,6 +29,9 @@
             <td>{{ user.address }}</td>
             <td>{{ user.created_at }}</td>
             <td>{{ user.email }}</td>
+            <td>
+              <button @click="deleteUser(user.id)">Delete</button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -45,7 +49,8 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  background-color: rgb(236, 233, 233);
+  background-color: rgb(255, 255, 255);
+  border: 2px solid #182d4d;
   text-align: center;
   justify-content: center;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -75,7 +80,7 @@
 }
 
 .addBtn:hover {
-  background-color: #929292;
+  background-color: #182d4d;
   color: #fff;
   transition: all 0.2s ease-in-out;
   transform: scale(1.1);
@@ -108,6 +113,7 @@
   height: 10vh;
 }
 
+
 .table-wrapper {
   position: relative;
   height: 55em;
@@ -120,6 +126,18 @@ table {
   border-collapse: collapse;
   position: sticky;
   top: 0;
+}
+
+table img {
+  width: 5rem;
+  height: 3rem;
+  transition: all 0.2s ease-in-out;
+}
+table img:hover {
+  transform: scale(1.5);
+  transition: all 0.2s ease-in-out;
+  width: 10rem;
+  height: 6rem;
 }
 
 td,
@@ -140,10 +158,10 @@ tr:hover {
 
 th {
   text-align: left;
-  background-color: #929292;
+  background-color: #182d4d;
   position: sticky; /* add this style */
   top: 0; /* add this style */
-  color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
 }
 td {
   text-align: left;
@@ -174,9 +192,23 @@ export default {
       })
   },
   methods: {
-    searchUsers() {
-      // the filteredUsers computed property will automatically update based on the searchTerm
+  async fetchUsers() {
+    try {
+      const response = await axios.get('http://54.86.195.171:3000/api/v1/users');
+      this.users = response.data;
+    } catch (error) {
+      console.error(error);
     }
-  }
+  },
+  async deleteUser(id) {
+    try {
+      await axios.delete(`http://54.86.195.171:3000/api/v1/users/${id}`);
+      // Refresh the list of users after successful deletion
+      this.fetchUsers();
+    } catch (error) {
+      console.error(error);
+    }
+  },
+}
 }
 </script>

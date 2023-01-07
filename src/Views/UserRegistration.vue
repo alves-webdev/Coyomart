@@ -35,20 +35,21 @@
 
 <style scoped>
 .form-container {
+  border: 2px solid #182d4d;
   font-size: 1.8em;
   position: relative;
   border-radius: 20px;
-  width: 30em;
-  height: 20em;
+  width: 26em;
+  height: 16em;
   padding-bottom: 2.5em;
   color: #000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  background-color: rgb(236, 233, 233);
+  background-color:#fafafa;
   text-align: center;
   justify-content: center;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Roboto', sans-serif;
   padding-top: 8%;
   margin-left: 20%;
 }
@@ -82,7 +83,7 @@ input {
   height: 1em;
   padding: 1.5em;
   margin-bottom: 0.5em;
-  border: 1px solid #ccc;
+  border: 2px solid #182d4d;
   border-radius: 4px;
   box-sizing: border-box;
 }
@@ -90,27 +91,47 @@ input {
 .button-container {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 6em;
   align-items: center;
 }
 
+
 button {
-  width: 5sem;
-  background-color: #4CAF50;
+  background-color: #182d4d;
+  border: 2px solid #ffffff;
   color: white;
+  justify-content: center;
+  padding: 0.6em 2em;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 1em;
+  font-size: 0.8em;
   cursor: pointer;
   border-radius: 4px;
   transition: 0.5s ease-in-out;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #ffffff;
+  color: #182d4d;
+  border: 2px solid #182d4d;
   transition: 0.5s ease-in-out;
   transform: scale(1.1);
+}
+
+button:nth-child(2) {
+  background-color: #ffffff;
+  color: #182d4d;
+  border: 2px solid #182d4d;
+}
+
+button:nth-child(2):hover {
+  background-color: #182d4d;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  transition: 0.5s ease-in-out;
+  transform: scale(1.15);
 }
 
 @media screen and (max-width: 800px) {
@@ -143,53 +164,52 @@ export default {
     saveUser() {
       this.loading = true;
       this.errors = {}
-      if (!this.name) {
-        this.errors.name = ['The name field is required']
-      } else if (/\d/.test(this.name)) {
-        this.errors.name = ['The name field must not contain numbers']
-      }
-      if (!this.address) {
-        this.errors.address = ['The address field is required']
-      }
-      if (this.includePicture && !this.picture) {
-        this.errors.picture = ['The picture field is required']
-      }
-      if (!this.email) {
-        this.errors.email = ['The email field is required']
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
-        this.errors.email = ['The email field must be a valid email address']
-      }
-
-      if (Object.keys(this.errors).length === 0) {
-        axios.get('http://54.86.195.171:3000//api/v1/users')
-          .then(response => {
-            this.usersRegistred = response.data
-            this.usersRegistred.forEach(user => {
-              if (user.email === this.email) {
-                this.errors.email = ['E-mail ja cadastrado, tente outro']
-              }
-            })
-          })
-        axios.post('http://54.86.195.171:3000//api/v1/users', {
-          name: this.name,
-          address: this.address,
-          picture: this.picture,
-          email: this.email
-        })
-          .then(response => {
-            if (response.status === 201) {
-              this.name = '';
-              this.address = '';
-              this.picture = '';
-              this.email = '';
-              this.loading = false;
+      axios.post('http://54.86.195.171:3000//api/v1/check_email', {
+        email: this.email
+      })
+        .then(response => {
+          if (response.data.exists === true) {
+            this.errors.email = ['E-mail já cadastrado']
+          } else {
+            if (!this.name) {
+              this.errors.name = ['Nome não preenchido']
+            } else if (/\d/.test(this.name)) {
+              this.errors.name = ['Nome não pode conter números']
             }
-          })
-          .catch(error => {
-            // handle error
-            console.log(error)
-          })
-      }
+            if (!this.address) {
+              this.errors.address = ['Endereço não preenchido']
+            }
+            if (this.includePicture && !this.picture) {
+              this.errors.picture = ['Link da imagem não preenchido']
+            }
+            if (!this.email) {
+              this.errors.email = ['E-mail não preenchido']
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+              this.errors.email = ['E-mail inválido']
+            }
+          }
+          if (Object.keys(this.errors).length === 0) {
+            axios.post('http://54.86.195.171:3000//api/v1/users', {
+              name: this.name,
+              address: this.address,
+              picture: this.picture,
+              email: this.email
+            })
+              .then(response => {
+                if (response.status === 201) {
+                  this.name = '';
+                  this.address = '';
+                  this.picture = '';
+                  this.email = '';
+                  this.loading = false;
+                }
+              })
+              .catch(error => {
+                // handle error
+                console.log(error)
+              })
+          }
+        })
     },
     cancel() {
       this.$router.push({ name: 'Users' })
